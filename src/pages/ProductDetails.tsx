@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { listingsAPI } from "@/lib/api"; // ✅ make sure this exists like in Explore.jsx
+import { listingsAPI } from "@/lib/api";
 import {
   MapPin,
   Eye,

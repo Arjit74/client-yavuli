@@ -1,5 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +24,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -226,11 +230,38 @@ const ProductDetails = () => {
             </Card>
 
             <div className="flex gap-3">
-              <Button className="flex-1 bg-gradient-hero text-white hover:shadow-glow">
+              <Button 
+                className="flex-1 bg-gradient-hero text-white hover:shadow-glow"
+                onClick={() => {
+                  if (!product) return;
+                  addToCart({
+                    id: product._id,
+                    title: product.title,
+                    price: product.price,
+                    image: product.images[0],
+                    sellerId: product.seller_id
+                  });
+                  toast.success('Added to cart!');
+                }}
+              >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
-              <Button variant="outline" className="flex-1 border-accent text-accent hover:bg-accent hover:text-white">
+              <Button 
+                variant="outline" 
+                className="flex-1 border-accent text-accent hover:bg-accent hover:text-white"
+                onClick={() => {
+                  if (!product) return;
+                  addToCart({
+                    id: product._id,
+                    title: product.title,
+                    price: product.price,
+                    image: product.images[0],
+                    sellerId: product.seller_id
+                  });
+                  navigate('/cart');
+                }}
+              >
                 Buy Now
               </Button>
             </div>

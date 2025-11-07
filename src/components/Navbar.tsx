@@ -1,13 +1,17 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Search, Heart, ShoppingCart, User, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Search, Heart, ShoppingCart, User, Menu, X } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const cart = useCart();
+
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -67,12 +71,16 @@ const Navbar = () => {
             <Button variant="ghost" size="icon" className="relative hidden md:flex hover:bg-accent/10 hover:text-accent">
               <Heart className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="relative hover:bg-accent/10 hover:text-accent">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs text-white">
-                0
-              </span>
-            </Button>
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative hover:bg-accent/10 hover:text-accent">
+                <ShoppingCart className="h-5 w-5" />
+                {useCart().cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs text-white">
+                    {useCart().cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
             
             {/* Profile Menu */}
             <div className="relative hidden md:block">

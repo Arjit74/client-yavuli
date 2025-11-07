@@ -15,6 +15,7 @@ import {
   Package,
   Receipt,
 } from "lucide-react";
+import { listingsAPI } from "@/lib/api";
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,24 +35,14 @@ const ProductDetails = () => {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching product:", id);
+        console.log("Fetching product via listingsAPI:", id);
+        const allProducts = await listingsAPI.getAll();
 
-        const response = await fetch(
-          `https://server-yavuli.onrender.com/api/listings/${encodeURIComponent(id)}`
-        );
+        // find product by id (Supabase returns strings)
+        const productData = allProducts.find((p: any) => String(p.id) === String(id));
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch product (status ${response.status})`);
-        }
-
-        const data = await response.json();
-        console.log("Product data:", data);
-
-        // Sometimes the backend returns { data: { ... } } or an array
-        const productData = data?.data || data?.[0] || data;
-
-        if (!productData || Object.keys(productData).length === 0) {
-          setError("Product not found or missing data");
+        if (!productData) {
+          setError("Product not found in Supabase");
         } else {
           setProduct(productData);
         }
@@ -119,9 +110,7 @@ const ProductDetails = () => {
           <div className="space-y-6 animate-fade-in">
             <div>
               <div className="flex items-start justify-between mb-2">
-                <h1 className="text-3xl font-bold text-primary">
-                  {product.title}
-                </h1>
+                <h1 className="text-3xl font-bold text-primary">{product.title}</h1>
                 <Button variant="ghost" size="icon" className="hover:text-destructive">
                   <Heart className="h-6 w-6" />
                 </Button>
@@ -129,9 +118,7 @@ const ProductDetails = () => {
 
               <div className="flex items-center gap-2 mb-4">
                 {product.condition && (
-                  <Badge className="bg-accent text-white">
-                    {product.condition}
-                  </Badge>
+                  <Badge className="bg-accent text-white">{product.condition}</Badge>
                 )}
                 {product.verified && (
                   <Badge variant="outline" className="border-accent text-accent">

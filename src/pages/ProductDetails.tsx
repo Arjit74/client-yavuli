@@ -37,7 +37,7 @@ const ProductDetails = () => {
 
         console.log("ProductDetails: requested id =", id);
 
-        // Prefer a single-item helper if it exists
+        // Try single-item fetch helpers first (if listingsAPI exposes them)
         const singleFetchFn =
           (listingsAPI as any).get ||
           (listingsAPI as any).getById ||
@@ -47,10 +47,10 @@ const ProductDetails = () => {
           try {
             const singleResp = await singleFetchFn(id);
             console.log("listingsAPI.singleFetch response:", singleResp);
-            // try to normalize
             const candidate =
               singleResp && singleResp?.data
-                ? Array.isArray(singleResp.data)
+                ? // handle shapes like { data: {...} } or { data: [ {...} ] }
+                  Array.isArray(singleResp.data)
                   ? singleResp.data[0]
                   : singleResp.data
                 : singleResp;
@@ -63,33 +63,42 @@ const ProductDetails = () => {
           }
         }
 
-        // Fallback: fetch all and find the item
+        // Fallback: fetch all and normalize common wrapper shapes
         const raw = await (listingsAPI.getAll ? listingsAPI.getAll() : (listingsAPI as any)());
         console.log("listingsAPI.getAll() raw response:", raw);
 
+        // Many API clients return either:
+        // - an array
+        // - { data: [...] }
+        // - axios response: { data: { data: [...] } }
+        // Normalize to an array of products:
         let allProducts: any[] = [];
+
         if (Array.isArray(raw)) {
           allProducts = raw;
         } else if (raw?.data && Array.isArray(raw.data)) {
           allProducts = raw.data;
+        } else if (raw?.data?.data && Array.isArray(raw.data.data)) {
+          // e.g. axiosResponse.data = { success: true, data: [...] }
+          allProducts = raw.data.data;
         } else if (raw?.rows && Array.isArray(raw.rows)) {
           allProducts = raw.rows;
-        } else if (raw?.listings && Array.isArray(raw.listings)) {
-          allProducts = raw.listings;
         } else {
-          // try to coerce any object values into an array as a last resort
+          // last resort: try object values
           try {
-            const vals = Object.values(raw || {}).filter(Boolean);
-            if (Array.isArray(vals) && vals.length) allProducts = vals;
+            const vals = Object.values(raw || {}).flatMap((v: any) => (Array.isArray(v) ? v : [v]));
+            allProducts = vals.filter(Boolean);
           } catch {
             allProducts = [];
           }
         }
 
+        console.log("Normalized products length:", allProducts.length);
+
         const found = allProducts.find((p: any) => String(p?.id) === String(id));
 
         if (!found) {
-          setError("Product not found");
+          setError("Product not found :(");
           setProduct(null);
         } else {
           setProduct(found);
@@ -123,11 +132,7 @@ const ProductDetails = () => {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold text-primary">Product not found</h1>
           <p className="text-muted-foreground mt-2">{error}</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => window.history.back()}
-          >
+          <Button variant="outline" className="mt-4" onClick={() => window.history.back()}>
             Go Back
           </Button>
         </div>

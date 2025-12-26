@@ -13,8 +13,18 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('');
+      const { error } = await signInWithGoogle();
+      if (error) throw error;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +72,7 @@ const Login = () => {
         )}
 
         {/* Google Sign In */}
-        <Button variant="outline" className="w-full border-2 hover:bg-muted">
+        <Button variant="outline" className="w-full border-2 hover:bg-muted" onClick={handleGoogleSignIn}>
           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
             <path
               fill="currentColor"

@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import type { CustomVariants } from 'framer-motion';
 import { SplineSceneBasic } from "@/components/ui/demo";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 import { 
   Sparkles, 
@@ -18,6 +21,65 @@ import {
 } from "lucide-react";
 
 const Welcome = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    // Check if this is an OAuth callback
+    const code = searchParams.get('code');
+    if (code) {
+      setIsProcessing(true);
+      console.log('OAuth code detected:', code);
+      
+      // Wait for Supabase to process the OAuth code
+      const handleOAuthCallback = async () => {
+        try {
+          // Wait longer for the session to be established by Supabase
+          // detectSessionInUrl should process the code automatically
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Check if session was established
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          console.log('Session check result:', { session: !!session, error });
+          
+          if (error) {
+            console.error('Session error:', error);
+            throw error;
+          }
+
+          if (session) {
+            console.log('Session found, redirecting to explore');
+            // User is authenticated, redirect to explore
+            navigate('/explore', { replace: true });
+          } else {
+            console.log('No session found, redirecting to login');
+            // Session not established, redirect to login
+            navigate('/login', { replace: true });
+          }
+        } catch (error) {
+          console.error('OAuth callback error:', error);
+          navigate('/login', { replace: true });
+        }
+      };
+
+      handleOAuthCallback();
+    }
+  }, [searchParams, navigate]);
+
+  // Show loading screen while processing OAuth
+  if (isProcessing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-bold text-white">Processing your login...</h2>
+          <p className="text-white/60">Please wait while we verify your credentials.</p>
+        </div>
+      </div>
+    );
+  }
   const containerVariants: CustomVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -114,7 +176,7 @@ const Welcome = () => {
           >
             <motion.div variants={itemVariants}>
               <Button 
-                onClick={() => window.location.href = '/explore'}
+                onClick={() => navigate('/explore')}
                 size="lg" 
                 className="relative bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 text-lg font-semibold py-7 px-12 rounded-2xl overflow-hidden group border-0 font-poppins cursor-pointer"
               >
@@ -284,7 +346,7 @@ const Welcome = () => {
             </p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                onClick={() => window.location.href = '/signup'}
+                onClick={() => navigate('/explore')}
                 size="lg" 
                 className="relative bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 font-semibold py-7 px-14 rounded-2xl overflow-hidden group border-0 font-poppins cursor-pointer"
               >

@@ -25,51 +25,67 @@ const Welcome = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
+    console.log('Welcome component mounted');
+    console.log('Current URL:', window.location.href);
+    console.log('Search params:', Object.fromEntries(searchParams));
+    
     // Check if this is an OAuth callback
     const code = searchParams.get('code');
     const sessionState = searchParams.get('state');
     
+    console.log('Code from URL:', code);
+    console.log('State from URL:', sessionState);
+    
     if (code || sessionState) {
+      console.log('Starting OAuth processing...');
       setIsProcessing(true);
-      console.log('OAuth code/state detected:', { code, sessionState });
+      setDebugInfo('Processing OAuth...');
       
       // Wait for Supabase to process the OAuth code
       const handleOAuthCallback = async () => {
         try {
+          console.log('Waiting for session to be established...');
+          setDebugInfo('Waiting for session...');
+          
           // Wait longer for the session to be established by Supabase
-          // detectSessionInUrl should process the code automatically
-          await new Promise(resolve => setTimeout(resolve, 4000));
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          
+          console.log('Checking for session...');
+          setDebugInfo('Checking session...');
           
           // Check if session was established
           const { data: { session }, error } = await supabase.auth.getSession();
           
           console.log('Session check result:', { session: !!session, error });
+          setDebugInfo(`Session: ${session ? 'Found' : 'Not found'}`);
           
-          if (error) {
-            console.error('Session error:', error);
-            // Don't throw, just try navigating anyway
-          }
-
           if (session) {
-            console.log('Session found, redirecting to explore');
-            // User is authenticated, redirect to explore
+            console.log('Session found! Redirecting to explore...');
             navigate('/explore', { replace: true });
           } else {
-            console.log('No session found after 4 seconds, redirecting to login');
-            // Session not established, redirect to login
+            console.log('No session found. Redirecting to login...');
             navigate('/login', { replace: true });
           }
         } catch (error) {
           console.error('OAuth callback error:', error);
+          setDebugInfo(`Error: ${error}`);
           navigate('/login', { replace: true });
-        } finally {
-          setIsProcessing(false);
         }
       };
 
-      handleOAuthCallback();
+      // Set a timeout to force redirect after 10 seconds
+      const timeoutId = setTimeout(() => {
+        console.log('Timeout: Forcing redirect to login');
+        navigate('/login', { replace: true });
+      }, 10000);
+
+      handleOAuthCallback().finally(() => {
+        clearTimeout(timeoutId);
+        setIsProcessing(false);
+      });
     }
   }, [searchParams, navigate]);
 
@@ -84,6 +100,7 @@ const Welcome = () => {
           <div>
             <h2 className="text-3xl font-bold text-white mb-2">Processing your login...</h2>
             <p className="text-white/70 text-lg">Please wait while we verify your credentials.</p>
+            {debugInfo && <p className="text-white/50 text-sm mt-4">{debugInfo}</p>}
           </div>
         </div>
       </div>

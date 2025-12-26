@@ -22,12 +22,7 @@ export default defineConfig({
     },
     // Optimize chunking strategy
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-      },
-    },
+    minify: 'esbuild', // Use esbuild instead of terser (built-in with Vite)
   },
   server: {
     host: true,

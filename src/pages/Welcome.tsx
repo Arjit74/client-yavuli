@@ -29,16 +29,18 @@ const Welcome = () => {
   useEffect(() => {
     // Check if this is an OAuth callback
     const code = searchParams.get('code');
-    if (code) {
+    const sessionState = searchParams.get('state');
+    
+    if (code || sessionState) {
       setIsProcessing(true);
-      console.log('OAuth code detected:', code);
+      console.log('OAuth code/state detected:', { code, sessionState });
       
       // Wait for Supabase to process the OAuth code
       const handleOAuthCallback = async () => {
         try {
           // Wait longer for the session to be established by Supabase
           // detectSessionInUrl should process the code automatically
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await new Promise(resolve => setTimeout(resolve, 4000));
           
           // Check if session was established
           const { data: { session }, error } = await supabase.auth.getSession();
@@ -47,7 +49,7 @@ const Welcome = () => {
           
           if (error) {
             console.error('Session error:', error);
-            throw error;
+            // Don't throw, just try navigating anyway
           }
 
           if (session) {
@@ -55,13 +57,15 @@ const Welcome = () => {
             // User is authenticated, redirect to explore
             navigate('/explore', { replace: true });
           } else {
-            console.log('No session found, redirecting to login');
+            console.log('No session found after 4 seconds, redirecting to login');
             // Session not established, redirect to login
             navigate('/login', { replace: true });
           }
         } catch (error) {
           console.error('OAuth callback error:', error);
           navigate('/login', { replace: true });
+        } finally {
+          setIsProcessing(false);
         }
       };
 
@@ -72,10 +76,15 @@ const Welcome = () => {
   // Show loading screen while processing OAuth
   if (isProcessing) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-white">Processing your login...</h2>
-          <p className="text-white/60">Please wait while we verify your credentials.</p>
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative z-50">
+        <div className="text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-2">Processing your login...</h2>
+            <p className="text-white/70 text-lg">Please wait while we verify your credentials.</p>
+          </div>
         </div>
       </div>
     );

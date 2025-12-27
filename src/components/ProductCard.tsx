@@ -78,12 +78,29 @@ const ProductCard = ({
     setIsLoading(true);
     try {
       if (isFavorited) {
-        await listingsAPI.removeFavorite(id);
+        // UNFAVORITE  making a Direct Supabase Call
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('listing_id', id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
         setCurrentFavorites(prev => Math.max(0, prev - 1));
         setIsFavorited(false);
         toast.success('Removed from favorites');
       } else {
-        await listingsAPI.addFavorite(id);
+        // ADD FAVORITE  Direct Supabase Call
+        const { error } = await supabase
+          .from('favorites')
+          .insert({ 
+            listing_id: id, 
+            user_id: user.id 
+          });
+
+        if (error) throw error;
+
         setCurrentFavorites(prev => prev + 1);
         setIsFavorited(true);
         toast.success('Added to favorites');
@@ -96,31 +113,44 @@ const ProductCard = ({
     }
   }, [id, isFavorited, user]);
 
-  return (
+return (
     <Card className="group overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-      <Link to={`/product/${id}`}>
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      
+      {/* Container for Image + Heart + Badge */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+        
+        {/* 1. LINK: Wraps ONLY the image now */}
+        <Link to={`/product/${id}`} className="block h-full w-full">
           <img
             src={images[0]}
             alt={title}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
             loading="lazy"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`absolute top-2 right-2 h-8 w-8 rounded-full ${isFavorited ? 'bg-white text-destructive hover:bg-white/90' : 'bg-white/90 hover:bg-white hover:text-destructive'}`}
-            onClick={handleFavoriteClick}
-            disabled={isLoading}
-          >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
-          </Button>
-          <Badge className="absolute top-2 left-2 bg-accent text-white">
-            {condition}
-          </Badge>
-        </div>
-      </Link>
+        </Link>
 
+        {/* 2. BUTTON: Lives outside the link, floating on top */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full z-10 ${
+            isFavorited 
+              ? 'bg-white text-destructive hover:bg-white/90' 
+              : 'bg-white/90 hover:bg-white hover:text-destructive'
+          }`}
+          onClick={handleFavoriteClick}
+          disabled={isLoading}
+        >
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
+        </Button>
+
+        {/* 3. BADGE: Also outside the link */}
+        <Badge className="absolute top-2 left-2 bg-accent text-white pointer-events-none z-10">
+          {condition}
+        </Badge>
+      </div>
+
+      {/* Card Details Section */}
       <div className="p-3 space-y-2">
         <Link to={`/product/${id}`}>
           <h3 className="font-semibold text-sm line-clamp-1 text-foreground group-hover:text-accent transition-colors">

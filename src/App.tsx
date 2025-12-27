@@ -10,7 +10,7 @@ import Sell from "./pages/Sell";
 import Callback from "./components/auth/Callback";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
-import Favorites from "./pages/Favourites";
+import Favorites from "./pages/Favorites";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -39,7 +39,7 @@ const App = () => (
           <Route path="/auth/callback" element={<Callback />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/favourites" element={<Favorites />} />
+          <Route path="/favorites" element={<Favorites />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />

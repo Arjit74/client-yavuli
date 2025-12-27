@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext"; 
+import { supabase } from "@/integrations/supabase/client"; 
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -24,24 +26,29 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // --- New State for Favorites ---
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
+
   const { addToCart } = useCart();
+  const { user } = useAuth();   // Get current user
   const navigate = useNavigate();
 
-  // Record view when product page is loaded
+  // 1. Record View Count
   useEffect(() => {
     const recordView = async () => {
       if (!id) return;
-      
       try {
         await listingsAPI.incrementViewCount(id);
       } catch (error) {
         console.error('Error recording view:', error);
       }
     };
-    
     recordView();
   }, [id]);
 
+  // 2. Fetch Product Data
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) {
@@ -53,26 +60,17 @@ const ProductDetails = () => {
       try {
         setLoading(true);
         setError(null);
-
-        console.log("ProductDetails: requested id =", id);
-
-        try {
-          // Use the getById method directly
-          const productData = await listingsAPI.getById(id);
-          console.log("Product data from API:", productData);
-          
-          if (productData) {
-            setProduct(productData);
-          } else {
-            setError("Product not found");
-          }
-        } catch (err) {
-          console.error("Error fetching product:", err);
-          setError("Failed to load product details. Please try again later.");
+        // Use the getById method directly
+        const productData = await listingsAPI.getById(id);
+        
+        if (productData) {
+          setProduct(productData);
+        } else {
+          setError("Product not found");
         }
       } catch (err) {
-        console.error("Error in fetchProduct:", err);
-        setError("An unexpected error occurred. Please try again later.");
+        console.error("Error fetching product:", err);
+        setError("Failed to load product details.");
       } finally {
         setLoading(false);
       }
@@ -81,6 +79,69 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
+  // 3. Check if Favorited Database Check
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (!user || !id) return;
+      
+      try {
+        const { data } = await (supabase as any)
+          .from('favorites')
+          .select('id')
+          .eq('listing_id', id)
+          .eq('user_id', user.id)
+          .maybeSingle(); // Returns data if exists, null if not
+
+        if (data) setIsFavorited(true);
+      } catch (err) {
+        console.error("Error checking favorite:", err);
+      }
+    };
+    checkFavoriteStatus();
+  }, [id, user]);
+
+  // 4. Handle Heart Click 
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      toast.info("Please sign in to favorite items");
+      return;
+    }
+    if (!id) return;
+
+    setFavLoading(true);
+    try {
+      if (isFavorited) {
+        // Remove from DB
+        const { error } = await (supabase as any)
+          .from('favorites')
+          .delete()
+          .eq('listing_id', id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        setIsFavorited(false);
+        toast.success("Removed from favorites");
+      } else {
+        // Add to DB
+        const { error } = await (supabase as any)
+          .from('favorites')
+          .insert({ listing_id: id, user_id: user.id });
+
+        if (error) throw error;
+
+        setIsFavorited(true);
+        toast.success("Added to favorites");
+      }
+    } catch (err) {
+      console.error("Favorite error:", err);
+      toast.error("Something went wrong");
+    } finally {
+      setFavLoading(false);
+    }
+  };
+
+  // --- Loading State ---
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -92,6 +153,7 @@ const ProductDetails = () => {
     );
   }
 
+  // --- Error State ---
   if (error || !product) {
     return (
       <div className="min-h-screen bg-background">
@@ -123,7 +185,8 @@ const ProductDetails = () => {
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Image */}
+          
+          {/* Image Section */}
           <div className="space-y-4 animate-fade-in">
             <div className="aspect-square rounded-xl overflow-hidden bg-muted">
               <img
@@ -134,14 +197,24 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Info */}
+          {/* Info Section */}
           <div className="space-y-6 animate-fade-in">
             <div>
               <div className="flex items-start justify-between mb-2">
                 <h1 className="text-3xl font-bold text-primary">{product.title}</h1>
-                <Button variant="ghost" size="icon" className="hover:text-destructive">
-                  <Heart className="h-6 w-6" />
+                
+                {/* --- ❤️ THE ACTIVE HEART BUTTON --- */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={`hover:text-destructive transition-colors ${isFavorited ? 'text-destructive' : 'text-muted-foreground'}`}
+                  onClick={handleToggleFavorite}
+                  disabled={favLoading}
+                >
+                  <Heart className={`h-8 w-8 ${isFavorited ? 'fill-current' : ''}`} />
                 </Button>
+                {/* ---------------------------------- */}
+                
               </div>
 
               <div className="flex items-center gap-2 mb-4">
@@ -159,6 +232,7 @@ const ProductDetails = () => {
 
             <Separator />
 
+            {/* Seller Info Card */}
             <Card className="p-4 bg-muted/50">
               <h3 className="font-semibold mb-3">Seller Information</h3>
               <div className="space-y-2 text-sm">
@@ -186,19 +260,20 @@ const ProductDetails = () => {
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    {product.views || 0} views • {product.favorites || 0} favorites
+                    {product.views || 0} views
                   </span>
                 </div>
               </div>
             </Card>
 
+            {/* Action Buttons */}
             <div className="flex gap-3">
               <Button 
                 className="flex-1 bg-gradient-hero text-white hover:shadow-glow"
                 onClick={() => {
                   if (!product) return;
                   addToCart({
-                    id: product._id,
+                    id: product._id, // fallback if backend uses _id
                     title: product.title,
                     price: product.price,
                     image: product.images[0],

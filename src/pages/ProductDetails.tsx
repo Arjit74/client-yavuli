@@ -35,12 +35,19 @@ const ProductDetails = () => {
   const { user } = useAuth();   // Get current user
   const navigate = useNavigate();
 
-  // 1. Record View Count
+  // 1. Record View Count and update product data
   useEffect(() => {
     const recordView = async () => {
       if (!id) return;
       try {
-        await listingsAPI.incrementViewCount(id);
+        const updatedListing = await listingsAPI.incrementViewCount(id);
+        if (updatedListing) {
+          // Update the product with the new view count
+          setProduct((prev: any) => ({
+            ...prev,
+            views: updatedListing.views || 0,
+          }));
+        }
       } catch (error) {
         console.error('Error recording view:', error);
       }

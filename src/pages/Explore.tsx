@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { listingsAPI } from '@/lib/api';
+import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import FilterSidebar from "@/components/FilterSidebar";
 import ProductCard from "@/components/ProductCard";
@@ -51,6 +52,38 @@ const Explore = () => {
     fetchProducts();
   }, []);
 
+  // Subscribe to real-time updates for views and favorites
+  useEffect(() => {
+    try {
+      const subscription = supabase
+        .from('listings')
+        .on('*', payload => {
+          // When a listing is updated (view/favorite count changed)
+          const updatedListing = payload.new;
+          
+          // Update the products list with the new data
+          setProducts(prevProducts =>
+            prevProducts.map(product =>
+              product.id === updatedListing.id
+                ? {
+                    ...product,
+                    views: updatedListing.views || 0,
+                    favorites: updatedListing.favorites || 0,
+                  }
+                : product
+            )
+          );
+        })
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    } catch (error) {
+      console.error('Error setting up real-time subscription:', error);
+    }
+  }, []);
+
   // Apply filters and search
   useEffect(() => {
     let filtered = [...products];
@@ -74,9 +107,11 @@ const Explore = () => {
       (product.price ?? 0) >= filters.priceRange[0] && (product.price ?? 0) <= filters.priceRange[1]
     );
 
-    // Apply condition filter
+    // Apply condition filter (case-insensitive)
     if (filters.condition) {
-      filtered = filtered.filter(product => product.condition === filters.condition);
+      filtered = filtered.filter(product => 
+        product.condition?.toLowerCase() === filters.condition.toLowerCase()
+      );
     }
 
     // Apply verified filter

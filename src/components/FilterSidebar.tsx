@@ -48,7 +48,8 @@ const FilterSidebar = ({ filters, onFilterChange, onClearAll }: FilterSidebarPro
   };
 
   const handleConditionChange = (condition: string, checked: boolean) => {
-    onFilterChange({ condition: checked ? condition : "" });
+    // Normalize condition to lowercase for consistent filtering
+    onFilterChange({ condition: checked ? condition.toLowerCase() : "" });
   };
 
   const handleVerifiedChange = (checked: boolean) => {

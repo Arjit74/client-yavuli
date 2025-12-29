@@ -94,14 +94,23 @@ const ProductCard = ({
 
     try {
       const subscription = supabase
-        .from('listings')
-        .on('*', payload => {
-          if (payload.new?.id === id) {
-            // Update both favorites and views count from real-time update
-            setCurrentFavorites(payload.new.favorites || 0);
-            setCurrentViews(payload.new.views || 0);
+        .channel(`listings:${id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'listings',
+            filter: `id=eq.${id}`,
+          },
+          (payload) => {
+            if (payload.new?.id === id) {
+              // Update both favorites and views count from real-time update
+              setCurrentFavorites(payload.new.favorites || 0);
+              setCurrentViews(payload.new.views || 0);
+            }
           }
-        })
+        )
         .subscribe();
 
       return () => {

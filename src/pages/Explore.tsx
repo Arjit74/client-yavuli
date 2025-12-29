@@ -56,24 +56,32 @@ const Explore = () => {
   useEffect(() => {
     try {
       const subscription = supabase
-        .from('listings')
-        .on('*', payload => {
-          // When a listing is updated (view/favorite count changed)
-          const updatedListing = payload.new;
-          
-          // Update the products list with the new data
-          setProducts(prevProducts =>
-            prevProducts.map(product =>
-              product.id === updatedListing.id
-                ? {
-                    ...product,
-                    views: updatedListing.views || 0,
-                    favorites: updatedListing.favorites || 0,
-                  }
-                : product
-            )
-          );
-        })
+        .channel('public:listings')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'listings',
+          },
+          (payload) => {
+            // When a listing is updated (view/favorite count changed)
+            const updatedListing = payload.new;
+            
+            // Update the products list with the new data
+            setProducts(prevProducts =>
+              prevProducts.map(product =>
+                product.id === updatedListing.id
+                  ? {
+                      ...product,
+                      views: updatedListing.views || 0,
+                      favorites: updatedListing.favorites || 0,
+                    }
+                  : product
+              )
+            );
+          }
+        )
         .subscribe();
 
       return () => {

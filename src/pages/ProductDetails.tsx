@@ -100,6 +100,42 @@ const ProductDetails = () => {
     checkFavoriteStatus();
   }, [id, user]);
 
+  // 3.5 Subscribe to real-time updates for views and favorites count
+  useEffect(() => {
+    if (!id) return;
+
+    try {
+      const subscription = (supabase as any)
+        .channel(`product:${id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'listings',
+            filter: `id=eq.${id}`,
+          },
+          (payload: any) => {
+            if (payload.new?.id === id) {
+              // Update product with new views and favorites count
+              setProduct((prev: any) => ({
+                ...prev,
+                views: payload.new.views || 0,
+                favorites: payload.new.favorites || 0,
+              }));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    } catch (error) {
+      console.error('Error setting up real-time subscription:', error);
+    }
+  }, [id]);
+
   // 4. Handle Heart Click 
   const handleToggleFavorite = async () => {
     if (!user) {
@@ -119,6 +155,23 @@ const ProductDetails = () => {
           .eq('user_id', user.id);
 
         if (error) throw error;
+
+        // Update the listing's favorite count
+        const newCount = Math.max(0, (product.favorites || 0) - 1);
+        const { error: updateError } = await (supabase as any)
+          .from('listings')
+          .update({ favorites: newCount })
+          .eq('id', id);
+
+        if (updateError) {
+          console.error('Error updating favorite count:', updateError);
+        }
+
+        // Update local product state
+        setProduct((prev: any) => ({
+          ...prev,
+          favorites: newCount
+        }));
         
         setIsFavorited(false);
         toast.success("Removed from favorites");
@@ -129,6 +182,23 @@ const ProductDetails = () => {
           .insert({ listing_id: id, user_id: user.id });
 
         if (error) throw error;
+
+        // Update the listing's favorite count
+        const newCount = (product.favorites || 0) + 1;
+        const { error: updateError } = await (supabase as any)
+          .from('listings')
+          .update({ favorites: newCount })
+          .eq('id', id);
+
+        if (updateError) {
+          console.error('Error updating favorite count:', updateError);
+        }
+
+        // Update local product state
+        setProduct((prev: any) => ({
+          ...prev,
+          favorites: newCount
+        }));
 
         setIsFavorited(true);
         toast.success("Added to favorites");

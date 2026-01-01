@@ -350,7 +350,7 @@ const ProductDetails = () => {
                 onClick={() => {
                   if (!product) return;
                   addToCart({
-                    id: product._id, // fallback if backend uses _id
+                    id: product.id, // Use product.id from database
                     title: product.title,
                     price: product.price,
                     image: product.images[0],

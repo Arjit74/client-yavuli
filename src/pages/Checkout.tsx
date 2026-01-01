@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, ShoppingBag, AlertCircle } from "lucide-react";
+import { Loader2, ShoppingBag, AlertCircle, Minus, Plus, Trash2 } from "lucide-react";
 import { paymentsAPI, listingsAPI } from "@/lib/api";
 
 declare global {
@@ -29,7 +29,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, removeFromCart, updateQuantity } = useCart();
   const [searchParams] = useSearchParams();
 
   // State management
@@ -38,6 +38,7 @@ const Checkout = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isDirectBuy, setIsDirectBuy] = useState(false);
 
   // Check if it's a direct buy (from product page with query params)
   const directBuyListingId = searchParams.get("listingId");
@@ -58,6 +59,7 @@ const Checkout = () => {
 
         // If direct buy from product page
         if (directBuyListingId && directBuyPrice) {
+          setIsDirectBuy(true);
           const listing = await listingsAPI.getById(directBuyListingId);
           itemsToCheckout = [
             {
@@ -71,6 +73,7 @@ const Checkout = () => {
           ];
         } else {
           // From cart
+          setIsDirectBuy(false);
           itemsToCheckout = cartItems.map((item) => ({
             id: item.id,
             title: item.title,
@@ -106,6 +109,46 @@ const Checkout = () => {
 
     initializeCheckout();
   }, [user, cartItems, directBuyListingId, directBuyPrice, navigate]);
+
+  /**
+   * Process payment for a single item
+   * Creates order, opens Razorpay modal, verifies payment
+   */
+  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+    if (newQuantity < 1) {
+      // Remove item if quantity goes to 0
+      if (!isDirectBuy) {
+        removeFromCart(itemId);
+      }
+      setItems(prevItems => prevItems.filter(item => item.id !== itemId));
+      setTotalAmount(prevTotal => {
+        const item = items.find(i => i.id === itemId);
+        return item ? prevTotal - item.price * item.quantity : prevTotal;
+      });
+      return;
+    }
+
+    // Update quantity in cart context
+    if (!isDirectBuy) {
+      updateQuantity(itemId, newQuantity);
+    }
+
+    // Update local state
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      )
+    );
+
+    // Recalculate total
+    const newTotal = items.reduce((sum, item) => {
+      if (item.id === itemId) {
+        return sum + item.price * newQuantity;
+      }
+      return sum + item.price * item.quantity;
+    }, 0);
+    setTotalAmount(newTotal);
+  };
 
   /**
    * Process payment for a single item
@@ -278,7 +321,7 @@ const Checkout = () => {
               <Separator />
 
               {items.map((item) => (
-                <div key={item.id} className="flex gap-4 py-4">
+                <div key={item.id} className="flex gap-4 py-4 border-b last:border-b-0">
                   <div className="w-24 h-24 bg-muted rounded-md overflow-hidden">
                     <img
                       src={item.image}
@@ -287,10 +330,48 @@ const Checkout = () => {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-lg">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Qty: {item.quantity}
-                    </p>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-lg">{item.title}</h3>
+                      {!isDirectBuy && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                          onClick={() => handleQuantityChange(item.id, 0)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-2 my-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity - 1)
+                        }
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center font-medium">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity + 1)
+                        }
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+
                     <p className="text-lg font-bold text-primary mt-2">
                       ₹{item.price.toLocaleString()}
                     </p>

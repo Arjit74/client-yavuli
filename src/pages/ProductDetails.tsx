@@ -366,15 +366,21 @@ const ProductDetails = () => {
                 variant="outline" 
                 className="flex-1 border-accent text-accent hover:bg-accent hover:text-white"
                 onClick={() => {
-                  if (!product) return;
-                  addToCart({
-                    id: product._id,
-                    title: product.title,
-                    price: product.price,
-                    image: product.images[0],
-                    sellerId: product.seller_id
-                  });
-                  navigate('/cart');
+                  if (!product || !user) {
+                    toast.info("Please sign in to purchase");
+                    navigate("/auth/login");
+                    return;
+                  }
+                  
+                  if (product.seller_id === user.id) {
+                    toast.error("You cannot buy your own listing");
+                    return;
+                  }
+                  
+                  // Direct checkout - bypass cart
+                  navigate(
+                    `/checkout?listingId=${product.id}&price=${product.price}`
+                  );
                 }}
               >
                 Buy Now

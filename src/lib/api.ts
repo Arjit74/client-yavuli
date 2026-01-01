@@ -235,6 +235,81 @@ api.interceptors.response.use(
   }
 );
 
+// Payments API
+export const paymentsAPI = {
+  // Create order for payment
+  createOrder: async (listingId: string, itemPrice: number) => {
+    try {
+      const response = await api.post("/payments/create-order", {
+        listingId,
+        itemPrice,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating payment order:", error);
+      throw error;
+    }
+  },
+
+  // Verify payment after Razorpay checkout
+  verifyPayment: async (
+    razorpayOrderId: string,
+    razorpayPaymentId: string,
+    razorpaySignature: string,
+    transactionId: string
+  ) => {
+    try {
+      const response = await api.post("/payments/verify-payment", {
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpaySignature,
+        transactionId,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      throw error;
+    }
+  },
+
+  // Get transaction details
+  getTransaction: async (transactionId: string) => {
+    try {
+      const response = await api.get(`/payments/transaction/${transactionId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching transaction:", error);
+      throw error;
+    }
+  },
+
+  // Get buyer's purchase history
+  getPurchases: async (page: number = 1, limit: number = 10) => {
+    try {
+      const response = await api.get("/payments/my-purchases", {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching purchases:", error);
+      throw error;
+    }
+  },
+
+  // Get seller's sales history
+  getSales: async (page: number = 1, limit: number = 10) => {
+    try {
+      const response = await api.get("/payments/my-sales", {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching sales:", error);
+      throw error;
+    }
+  },
+};
+
 export const reportsAPI = {
   submitReport: (reportData: any) => api.post("/reports", reportData),
 };

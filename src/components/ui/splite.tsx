@@ -21,10 +21,13 @@ export function SplineScene({ scene, className }: SplineSceneProps) {
         </div>
       }
     >
-      <Spline
-        scene={scene}
-        className={className}
-      />
+      {/*  I added a wrapper div here with "touch none" */}
+      <div className="w-full h-full touch-none overflow-hidden"> 
+          <Spline
+            scene={scene}
+            className={className}
+          />
+      </div>
     </Suspense>
   )
 }

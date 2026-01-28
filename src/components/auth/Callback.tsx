@@ -1,7 +1,7 @@
 // src/pages/auth/Callback.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
@@ -13,17 +13,17 @@ export default function AuthCallback() {
       try {
         // Check if there's a code in the URL (OAuth callback)
         const code = searchParams.get('code');
-        
+
         if (code) {
           // Wait for Supabase to process the OAuth code
           await new Promise(resolve => setTimeout(resolve, 500));
         }
-        
+
         // Wait a bit for the session to be established
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           throw error;
         }

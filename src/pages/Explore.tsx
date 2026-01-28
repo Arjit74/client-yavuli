@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { listingsAPI } from '@/lib/api';
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";

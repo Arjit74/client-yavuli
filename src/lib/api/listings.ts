@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export const listingsAPI = {
   // Get all listings
@@ -7,7 +7,7 @@ export const listingsAPI = {
       .from('listings')
       .select('*')
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data;
   },
@@ -19,7 +19,7 @@ export const listingsAPI = {
       .select('*')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -31,7 +31,7 @@ export const listingsAPI = {
       .select('*')
       .order('views', { ascending: false })
       .limit(10);
-    
+
     if (error) throw error;
     return data;
   },
@@ -43,7 +43,7 @@ export const listingsAPI = {
       .upsert([{ listing_id: listingId }])
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -54,7 +54,7 @@ export const listingsAPI = {
       .from('favorites')
       .delete()
       .eq('listing_id', listingId);
-    
+
     if (error) throw error;
     return true;
   },
@@ -69,7 +69,7 @@ export const listingsAPI = {
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data.map(item => ({
       ...item.listing,
@@ -82,7 +82,7 @@ export const listingsAPI = {
     const { data, error } = await supabase.rpc('increment_view_count', {
       listing_id_param: listingId
     });
-    
+
     if (error) throw error;
     return data;
   },

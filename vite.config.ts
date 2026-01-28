@@ -37,8 +37,8 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        // target: 'https://server-yavuli.onrender.com',
+        // target: 'http://localhost:5000',
+        target: 'https://server-yavuli.onrender.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),

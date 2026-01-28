@@ -21,6 +21,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { motion } from "framer-motion";
+import SEO from "@/components/SEO";
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -80,6 +81,10 @@ const Welcome = () => {
 
   return (
     <div className="relative min-h-screen w-full bg-white overflow-x-hidden selection:bg-primary/20">
+      <SEO
+        title="Yavuli | The Ultimate Student Marketplace"
+        description="Buy what you need, sell what you don't. Yavuli is the centralized marketplace for student essentials: textbooks, electronics, furniture, and more."
+      />
       {/* Background layer */}
       <div className="fixed inset-0 z-0">
         <TheInfiniteGrid />
@@ -100,7 +105,7 @@ const Welcome = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 p-3 border-slate-100 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl">
                 <div className="px-2 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Contact Us</div>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-default rounded-xl hover:bg-slate-50">
+                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-default rounded-xl hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 transition-colors">
                   <div className="flex items-center gap-2 text-primary font-semibold">
                     <Phone className="h-4 w-4" />
                     <span>Call Support</span>
@@ -108,7 +113,7 @@ const Welcome = () => {
                   <span className="text-sm font-bold text-slate-900">+91 8000363769</span>
                 </DropdownMenuItem>
                 <div className="h-px bg-slate-100 my-2 mx-1" />
-                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-default rounded-xl hover:bg-slate-50">
+                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-default rounded-xl hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 transition-colors">
                   <div className="flex items-center gap-2 text-primary font-semibold">
                     <Mail className="h-4 w-4" />
                     <span>Email Us</span>
@@ -166,7 +171,7 @@ const Welcome = () => {
             <Button size="lg" className="px-12 h-16 text-lg font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 active:scale-95" onClick={() => navigate('/explore')}>
               Start Browsing <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button variant="outline" size="lg" className="px-12 h-16 text-lg font-bold rounded-2xl bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50 transition-colors text-slate-600" onClick={() => navigate('/sell')}>
+            <Button variant="outline" size="lg" className="px-12 h-16 text-lg font-bold rounded-2xl bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors text-slate-600" onClick={() => navigate('/sell')}>
               Start Selling
             </Button>
           </motion.div>

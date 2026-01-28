@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { ChevronLeft } from 'lucide-react';
+import SEO from "@/components/SEO";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -60,6 +61,10 @@ const Login = () => {
 
   return (
     <div className="relative min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 overflow-hidden selection:bg-primary/30">
+      <SEO
+        title="Login | Yavuli"
+        description="Sign in to your Yavuli account to browse and buy campus essentials."
+      />
       {/* Background with stars (Shooting stars already updated to blue/default light) */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.05)_0%,rgba(255,255,255,0)_80%)]" />
@@ -85,7 +90,7 @@ const Login = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
+          className="text-slate-400 hover:text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 rounded-xl transition-colors"
         >
           <ChevronLeft className="mr-2 h-4 w-4" /> Back to Home
         </Button>
@@ -106,7 +111,7 @@ const Login = () => {
         <div className="space-y-4">
           <Button
             variant="outline"
-            className="w-full h-14 border-slate-100 bg-white hover:bg-slate-50 text-slate-900 rounded-2xl transition-all font-bold shadow-sm"
+            className="w-full h-14 border-slate-100 bg-white hover:bg-slate-50 hover:text-slate-900 focus:bg-slate-50 focus:text-slate-900 text-slate-900 rounded-2xl transition-all font-bold shadow-sm"
             onClick={handleGoogleLogin}
             disabled={loading}
           >

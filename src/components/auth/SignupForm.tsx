@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { ChevronLeft, Info } from 'lucide-react';
+import SEO from "@/components/SEO";
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -99,6 +100,10 @@ const Signup = () => {
 
   return (
     <div className="relative min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-primary/30 py-20">
+      <SEO
+        title="Sign Up | Yavuli"
+        description="Join Yavuli today and start trading with your campus community. Safe, secure, and exclusive for students."
+      />
       {/* Background with stars */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.05)_0%,rgba(255,255,255,0)_80%)]" />
@@ -124,7 +129,7 @@ const Signup = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
+          className="text-slate-400 hover:text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 rounded-xl transition-colors"
         >
           <ChevronLeft className="mr-2 h-4 w-4" /> Back
         </Button>
@@ -158,7 +163,7 @@ const Signup = () => {
         <div className="space-y-6">
           <Button
             variant="outline"
-            className="w-full h-14 border-slate-100 bg-white hover:bg-slate-50 text-slate-900 rounded-2xl transition-all font-bold shadow-sm"
+            className="w-full h-14 border-slate-100 bg-white hover:bg-slate-50 hover:text-slate-900 focus:bg-slate-50 focus:text-slate-900 text-slate-900 rounded-2xl transition-all font-bold shadow-sm"
             onClick={handleGoogleSignUp}
             disabled={loading}
           >

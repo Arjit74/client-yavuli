@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, X } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Explore = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -46,6 +47,10 @@ const Explore = () => {
 
   return (
     <div className="min-h-screen bg-white selection:bg-primary/20">
+      <SEO
+        title="Explore Marketplace | Yavuli"
+        description="Browse thousands of student-listed items. Find affordable textbooks, dorm essentials, and electronics at your campus."
+      />
       <Navbar />
 
       <main className="container mx-auto px-6 py-12 max-w-7xl">

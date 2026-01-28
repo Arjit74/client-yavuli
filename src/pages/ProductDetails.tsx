@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext"; 
-import { supabase } from "@/integrations/supabase/client"; 
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,14 @@ import {
   Receipt,
 } from "lucide-react";
 import { listingsAPI } from "@/lib/api";
+import SEO from "@/components/SEO";
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // --- New State for Favorites ---
   const [isFavorited, setIsFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
@@ -69,7 +70,7 @@ const ProductDetails = () => {
         setError(null);
         // Use the getById method directly
         const productData = await listingsAPI.getById(id);
-        
+
         if (productData) {
           setProduct(productData);
         } else {
@@ -90,7 +91,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const checkFavoriteStatus = async () => {
       if (!user || !id) return;
-      
+
       try {
         const { data } = await (supabase as any)
           .from('favorites')
@@ -179,7 +180,7 @@ const ProductDetails = () => {
           ...prev,
           favorites: newCount
         }));
-        
+
         setIsFavorited(false);
         toast.success("Removed from favorites");
       } else {
@@ -258,11 +259,15 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={product.title}
+        description={product.description || `Buy ${product.title} on Yavuli.`}
+      />
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-2 gap-8">
-          
+
           {/* Image Section */}
           <div className="space-y-4 animate-fade-in">
             <div className="aspect-square rounded-xl overflow-hidden bg-muted">
@@ -279,11 +284,11 @@ const ProductDetails = () => {
             <div>
               <div className="flex items-start justify-between mb-2">
                 <h1 className="text-3xl font-bold text-primary">{product.title}</h1>
-                
+
                 {/* --- ❤️ THE ACTIVE HEART BUTTON --- */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className={`hover:text-destructive transition-colors ${isFavorited ? 'text-destructive' : 'text-muted-foreground'}`}
                   onClick={handleToggleFavorite}
                   disabled={favLoading}
@@ -291,7 +296,7 @@ const ProductDetails = () => {
                   <Heart className={`h-8 w-8 ${isFavorited ? 'fill-current' : ''}`} />
                 </Button>
                 {/* ---------------------------------- */}
-                
+
               </div>
 
               <div className="flex items-center gap-2 mb-4">
@@ -345,7 +350,7 @@ const ProductDetails = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <Button 
+              <Button
                 className="flex-1 bg-gradient-hero text-white hover:shadow-glow"
                 onClick={() => {
                   if (!product) return;
@@ -362,8 +367,8 @@ const ProductDetails = () => {
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex-1 border-accent text-accent hover:bg-accent hover:text-white"
                 onClick={() => {
                   if (!product || !user) {
@@ -371,12 +376,12 @@ const ProductDetails = () => {
                     navigate("/auth/login");
                     return;
                   }
-                  
+
                   if (product.seller_id === user.id) {
                     toast.error("You cannot buy your own listing");
                     return;
                   }
-                  
+
                   // Direct checkout - bypass cart
                   navigate(
                     `/checkout?listingId=${product.id}&price=${product.price}`

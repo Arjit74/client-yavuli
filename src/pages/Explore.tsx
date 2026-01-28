@@ -14,9 +14,16 @@ const Explore = () => {
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("all");
 
-  const categories = ["All", "Electronics", "Books", "Fashion", "Furniture", "Others"];
+  const categories = [
+    { label: "All", value: "all" },
+    { label: "Electronics", value: "electronics" },
+    { label: "Books", value: "books" },
+    { label: "Fashion", value: "fashion" },
+    { label: "Furniture", value: "furniture" },
+    { label: "Others", value: "others" },
+  ];
 
   const fetchProducts = async () => {
     try {
@@ -39,7 +46,9 @@ const Explore = () => {
     let filtered = products.filter(product => {
       const matchesSearch = product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = activeCategory === "All" || product.category === activeCategory;
+      const matchesCategory =
+        activeCategory === "all" || product.category?.toLowerCase() === activeCategory;
+
       return matchesSearch && matchesCategory;
     });
     setFilteredProducts(filtered);
@@ -77,13 +86,13 @@ const Explore = () => {
         <div className="flex gap-3 mb-12 overflow-x-auto pb-4 no-scrollbar">
           {categories.map((cat) => (
             <Button
-              key={cat}
-              variant={activeCategory === cat ? "default" : "ghost"}
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-8 h-12 text-sm font-bold transition-all ${activeCategory === cat ? "shadow-lg shadow-primary/10" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+              key={cat.value}
+              variant={activeCategory === cat.value ? "default" : "ghost"}
+              onClick={() => setActiveCategory(cat.value)}
+              className={`rounded-full px-8 h-12 text-sm font-bold transition-all ${activeCategory === cat.value ? "shadow-lg shadow-primary/10" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }`}
             >
-              {cat}
+              {cat.label}
             </Button>
           ))}
         </div>
@@ -93,10 +102,10 @@ const Explore = () => {
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
             {filteredProducts.length} Results
           </p>
-          {(searchQuery || activeCategory !== "All") && (
+          {(searchQuery || activeCategory !== "all") && (
             <Button
               variant="link"
-              onClick={() => { setSearchQuery(""); setActiveCategory("All") }}
+              onClick={() => { setSearchQuery(""); setActiveCategory("all") }}
               className="h-auto p-0 text-primary font-bold"
             >
               Reset Filters
@@ -130,7 +139,7 @@ const Explore = () => {
               <p className="text-slate-500 font-medium">Try adjusting your search or category.</p>
             </div>
             <Button
-              onClick={() => { setSearchQuery(""); setActiveCategory("All") }}
+              onClick={() => { setSearchQuery(""); setActiveCategory("all") }}
               className="rounded-xl px-10 h-14 font-bold"
             >
               Show all items

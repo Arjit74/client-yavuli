@@ -193,6 +193,7 @@ function transformListing(listing: any) {
   return {
     id: listing.id || listing._id || 'unknown',
     title: listing.title || 'Untitled Listing',
+    category: listing.category || 'others',
     price: listing.price || 0,
     images: Array.isArray(listing.images) ? listing.images : [],
     location_city: listing.location || listing.location_city || 'N/A',

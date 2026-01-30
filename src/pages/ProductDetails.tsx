@@ -228,9 +228,19 @@ const ProductDetails = () => {
               </Button>
             </div>
 
-            <Button variant="outline" className="w-full">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Message Seller
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                if (product.seller_phone) {
+                  window.open(`tel:${product.seller_phone}`);
+                } else {
+                  toast.info("Seller hasn't provided a phone number");
+                }
+              }}
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              Call Seller
             </Button>
 
             <Separator />

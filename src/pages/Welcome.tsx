@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import SEO from "@/components/SEO";
+import { toast } from "sonner";
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -272,9 +273,9 @@ const Welcome = () => {
               <div className="space-y-4">
                 <h4 className="text-sm font-black uppercase tracking-widest text-slate-900">Policy</h4>
                 <ul className="space-y-2 text-sm text-slate-500 font-medium">
-                  <li><button className="hover:text-primary transition-colors">Safety Tips</button></li>
-                  <li><button className="hover:text-primary transition-colors">Privacy</button></li>
-                  <li><button className="hover:text-primary transition-colors">Terms</button></li>
+                  <li><button onClick={() => toast.info("Safety Tips coming soon!")} className="hover:text-primary transition-colors">Safety Tips</button></li>
+                  <li><button onClick={() => toast.info("Privacy Policy coming soon!")} className="hover:text-primary transition-colors">Privacy</button></li>
+                  <li><button onClick={() => toast.info("Terms of Service coming soon!")} className="hover:text-primary transition-colors">Terms</button></li>
                 </ul>
               </div>
               <div className="space-y-4 col-span-2 lg:col-span-1">

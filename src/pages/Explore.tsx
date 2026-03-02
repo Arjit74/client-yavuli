@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { listingsAPI } from '@/lib/api';
-import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import SEO from "@/components/SEO";
 
 const Explore = () => {
@@ -17,6 +15,7 @@ const Explore = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
   const [activeCategory, setActiveCategory] = useState("all");
+  const navigate = useNavigate();
 
   const categories = [
     { label: "All", value: "all" },
@@ -45,16 +44,23 @@ const Explore = () => {
   }, []);
 
   useEffect(() => {
-    let filtered = products.filter(product => {
-      const matchesSearch = product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const filtered = products.filter(product => {
+      const matchesSearch =
+        product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory =
         activeCategory === "all" || product.category?.toLowerCase() === activeCategory;
-
       return matchesSearch && matchesCategory;
     });
     setFilteredProducts(filtered);
   }, [products, searchQuery, activeCategory]);
+
+  const handleResetFilters = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('search');
+    setSearchParams(params, { replace: true });
+    setActiveCategory("all");
+  };
 
   return (
     <div className="min-h-screen bg-white selection:bg-primary/20">
@@ -100,7 +106,9 @@ const Explore = () => {
               key={cat.value}
               variant={activeCategory === cat.value ? "default" : "ghost"}
               onClick={() => setActiveCategory(cat.value)}
-              className={`rounded-full px-8 h-12 text-sm font-bold transition-all ${activeCategory === cat.value ? "shadow-lg shadow-primary/10" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+              className={`rounded-full px-8 h-12 text-sm font-bold transition-all ${activeCategory === cat.value
+                  ? "shadow-lg shadow-primary/10"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }`}
             >
               {cat.label}
@@ -116,12 +124,7 @@ const Explore = () => {
           {(searchQuery || activeCategory !== "all") && (
             <Button
               variant="link"
-              onClick={() => {
-                const params = new URLSearchParams(searchParams);
-                params.delete('search');
-                setSearchParams(params, { replace: true });
-                setActiveCategory("all");
-              }}
+              onClick={handleResetFilters}
               className="h-auto p-0 text-primary font-bold"
             >
               Reset Filters
@@ -138,32 +141,82 @@ const Explore = () => {
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-              />
+              <ProductCard key={product.id} {...product} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-32 space-y-6">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-50">
-              <X className="h-10 w-10 text-slate-400" />
+          <div className="space-y-10">
+            {/* Ghost listing — only when user has actually typed something */}
+            {searchQuery.trim() && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/sell?title=${encodeURIComponent(searchQuery.trim())}`)}
+                  className="group text-left focus:outline-none"
+                >
+                  {/* Card shell — mirrors ProductCard exactly */}
+                  <div className="overflow-hidden transition-all duration-200 hover:shadow-xl hover:-translate-y-1 border-2 border-dashed border-slate-200 hover:border-primary/40 rounded-[2rem] bg-white/70 cursor-pointer">
+                    {/* Image area */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
+                      <div className="flex flex-col items-center gap-2 opacity-30 group-hover:opacity-50 transition-opacity select-none">
+                        <svg className="h-14 w-14 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                      {/* badge like ProductCard's condition badge */}
+                      <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-500 border border-amber-200/80 select-none">
+                        Not listed yet
+                      </div>
+                    </div>
+
+                    {/* Details — same padding/spacing as ProductCard */}
+                    <div className="p-3 space-y-2">
+                      {/* Title — updates in real time with searchQuery */}
+                      <h3 className="font-semibold text-sm line-clamp-1 text-slate-400 group-hover:text-slate-700 transition-colors">
+                        {searchQuery}
+                      </h3>
+
+                      {/* CTA in place of price */}
+                      <p className="text-sm font-bold text-primary/50 group-hover:text-primary transition-colors">
+                        Sell yours →
+                      </p>
+
+                      {/* Location row placeholder */}
+                      <div className="flex items-center gap-1 text-xs text-slate-300">
+                        <svg className="h-3 w-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Your campus</span>
+                      </div>
+
+                      {/* College row placeholder */}
+                      <p className="text-xs text-slate-300 line-clamp-1">
+                        Be the first to list this item
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Message + show all button */}
+            <div className="text-center py-8 space-y-5">
+              <div className="space-y-1.5">
+                <p className="text-slate-400 font-medium text-sm">
+                  {searchQuery.trim()
+                    ? `No listings found for "${searchQuery}"`
+                    : "No matches found. Try adjusting your search or category."}
+                </p>
+              </div>
+              <Button
+                onClick={handleResetFilters}
+                variant="outline"
+                className="rounded-xl px-10 h-12 font-bold border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300"
+              >
+                Show all items
+              </Button>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-slate-900">No matches found</h3>
-              <p className="text-slate-500 font-medium">Try adjusting your search or category.</p>
-            </div>
-            <Button
-              onClick={() => {
-                const params = new URLSearchParams(searchParams);
-                params.delete('search');
-                setSearchParams(params, { replace: true });
-                setActiveCategory("all");
-              }}
-              className="rounded-xl px-10 h-14 font-bold"
-            >
-              Show all items
-            </Button>
           </div>
         )}
       </main>

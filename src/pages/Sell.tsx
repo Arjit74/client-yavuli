@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -152,6 +152,7 @@ const AGE_OPTIONS = [
 
 const Sell = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { session } = useAuth();
   const [images, setImages] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -159,8 +160,11 @@ const Sell = () => {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Pre-fill title from ?title= query param (set by ghost listing click)
+  const prefillTitle = searchParams.get('title') || '';
+
   const [formData, setFormData] = useState<FormData>({
-    title: '',
+    title: prefillTitle,
     category: '',
     condition: '',
     price: '',

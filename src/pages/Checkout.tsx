@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
@@ -39,6 +39,7 @@ const Checkout = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isDirectBuy, setIsDirectBuy] = useState(false);
+  const [showBlocker, setShowBlocker] = useState(false);
 
   // Check if it's a direct buy (from product page with query params)
   const directBuyListingId = searchParams.get("listingId");
@@ -452,21 +453,53 @@ const Checkout = () => {
                 <p>✓ Secure by Razorpay</p>
               </div>
 
+              {/* ── Payment Blocker Modal ── */}
+              {showBlocker && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setShowBlocker(false)}>
+                  <div
+                    className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 space-y-5 text-center animate-in fade-in zoom-in-95 duration-200"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="text-5xl">🚧</div>
+                    <div>
+                      <h3 className="text-xl font-black text-slate-900 mb-2">Payments paused for now</h3>
+                      <p className="text-sm text-slate-500 leading-relaxed">
+                        We're not processing payments through the platform right now.
+                        Please <span className="font-semibold text-slate-700">contact the seller directly</span> via chat or call, agree on a price, and arrange a meetup or delivery.
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left space-y-1">
+                      <p className="text-xs font-bold text-amber-700 uppercase tracking-widest">What to do</p>
+                      <p className="text-sm text-amber-800">1. Open the listing and tap <b>Message Seller</b></p>
+                      <p className="text-sm text-amber-800">2. Agree on price &amp; meetup location</p>
+                      <p className="text-sm text-amber-800">3. Pay cash on delivery / meetup</p>
+                    </div>
+                    <div className="flex flex-col gap-2 pt-1">
+                      <Link
+                        to="/how-to-use"
+                        className="inline-flex items-center justify-center gap-2 bg-slate-900 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-slate-700 transition-colors"
+                        onClick={() => setShowBlocker(false)}
+                      >
+                        See How to Use →
+                      </Link>
+                      <button
+                        className="text-sm text-slate-400 hover:text-slate-600 font-medium transition-colors py-1"
+                        onClick={() => setShowBlocker(false)}
+                      >
+                        Got it, close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Payment Button */}
               <Button
                 type="button"
-                className="w-full bg-gradient-hero text-white hover:shadow-glow h-12 text-base font-semibold disabled:opacity-50"
-                onClick={(e) => handlePayment(e)}
-                disabled={processingPayment || loading || error !== null}
+                className="w-full bg-gradient-hero text-white hover:shadow-glow h-12 text-base font-semibold"
+                onClick={() => setShowBlocker(true)}
               >
-                {processingPayment ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  `Pay ₹${totalAmount.toLocaleString()}`
-                )}
+                Pay ₹{totalAmount.toLocaleString()}
               </Button>
 
               {/* Cancel Button */}

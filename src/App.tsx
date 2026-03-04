@@ -30,6 +30,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import PayoutSetup from "./pages/PayoutSetup";
 import PayoutBanner from "./components/PayoutBanner";
 import HowToUse from "./pages/HowToUse";
+import FAQ from "./pages/FAQ";
 import ScrollToTop from "./components/ScrollToTop";
 
 import { HelmetProvider } from 'react-helmet-async';
@@ -75,6 +76,7 @@ const App = () => (
                   <Route path="/complete-profile" element={<CompleteProfile />} />
                   <Route path="/payout-setup" element={<PayoutSetup />} />
                   <Route path="/how-to-use" element={<HowToUse />} />
+                  <Route path="/faq" element={<FAQ />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

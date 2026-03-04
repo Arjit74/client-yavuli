@@ -30,6 +30,7 @@ export default function Footer() {
                                 )}
                             </li>
                             <li><button onClick={() => navigate('/how-to-use')} className="hover:text-primary transition-colors">How to Use</button></li>
+                            <li><button onClick={() => navigate('/faq')} className="hover:text-primary transition-colors">FAQ</button></li>
                         </ul>
                     </div>
                     <div className="space-y-4">

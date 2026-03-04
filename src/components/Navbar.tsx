@@ -232,6 +232,12 @@ const Navbar = () => {
               >
                 How to Use
               </Link>
+              <Link
+                to="/faq"
+                className={`text-sm font-semibold px-3 py-2 rounded-lg transition-colors hover:bg-accent/5 ${isActive('/faq') ? 'text-accent bg-accent/10' : 'text-foreground/80 hover:text-accent'}`}
+              >
+                FAQ
+              </Link>
             </div>
 
             {/* Action Icons */}
@@ -399,6 +405,20 @@ const Navbar = () => {
             >
               Sell
             </button>
+            <Link
+              to="/how-to-use"
+              className="block py-2 text-sm font-medium hover:text-accent transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              How to Use
+            </Link>
+            <Link
+              to="/faq"
+              className="block py-2 text-sm font-medium hover:text-accent transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              FAQ
+            </Link>
 
             {/* User-specific mobile links */}
             {user ? (

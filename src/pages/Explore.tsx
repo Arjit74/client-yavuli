@@ -107,8 +107,8 @@ const Explore = () => {
               variant={activeCategory === cat.value ? "default" : "ghost"}
               onClick={() => setActiveCategory(cat.value)}
               className={`rounded-full px-8 h-12 text-sm font-bold transition-all ${activeCategory === cat.value
-                  ? "shadow-lg shadow-primary/10"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                ? "shadow-lg shadow-primary/10"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }`}
             >
               {cat.label}
@@ -134,9 +134,23 @@ const Explore = () => {
 
         {/* Grid */}
         {loading ? (
-          <div className="min-h-[40vh] flex flex-col items-center justify-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="text-lg font-medium text-muted-foreground animate-pulse">Fetching items...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="rounded-[2rem] border border-slate-100 bg-white overflow-hidden">
+                <div className="aspect-[4/3] bg-slate-200 animate-pulse relative">
+                  <div className="absolute top-2 left-2 h-5 w-16 rounded-full bg-slate-300 animate-pulse" />
+                </div>
+                <div className="p-3 space-y-2.5">
+                  <div className="h-3.5 bg-slate-200 rounded-full w-4/5 animate-pulse" />
+                  <div className="h-5 bg-slate-300 rounded-full w-2/5 animate-pulse" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-3 w-3 rounded-full bg-slate-200 shrink-0 animate-pulse" />
+                    <div className="h-3 bg-slate-200 rounded-full w-3/5 animate-pulse" />
+                  </div>
+                  <div className="h-3 bg-slate-200 rounded-full w-1/2 animate-pulse" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

@@ -255,13 +255,19 @@ const Welcome = () => {
             {/* Grid */}
             {productsLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="rounded-[2rem] bg-slate-100 animate-pulse">
-                    <div className="aspect-[4/3] rounded-t-[2rem] bg-slate-200" />
-                    <div className="p-3 space-y-2">
-                      <div className="h-3 bg-slate-200 rounded-full w-3/4" />
-                      <div className="h-4 bg-slate-200 rounded-full w-1/2" />
-                      <div className="h-3 bg-slate-200 rounded-full w-2/3" />
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="rounded-[2rem] border border-slate-100 bg-white overflow-hidden">
+                    <div className="aspect-[4/3] bg-slate-200 animate-pulse relative">
+                      <div className="absolute top-2 left-2 h-5 w-14 rounded-full bg-slate-300 animate-pulse" />
+                    </div>
+                    <div className="p-3 space-y-2.5">
+                      <div className="h-3.5 bg-slate-200 rounded-full w-4/5 animate-pulse" />
+                      <div className="h-5 bg-slate-300 rounded-full w-2/5 animate-pulse" />
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-3 w-3 rounded-full bg-slate-200 shrink-0 animate-pulse" />
+                        <div className="h-3 bg-slate-200 rounded-full w-3/5 animate-pulse" />
+                      </div>
+                      <div className="h-3 bg-slate-200 rounded-full w-1/2 animate-pulse" />
                     </div>
                   </div>
                 ))}

@@ -29,17 +29,34 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Footer from "@/components/Footer";
-
+import ProductCard from "@/components/ProductCard";
+import { listingsAPI } from "@/lib/api";
 import YavuliLogoAnimation from "@/components/YavuliLogoAnimation";
 
 const Welcome = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [searchParams] = useSearchParams();
+  const [products, setProducts] = useState<any[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
 
   useEffect(() => {
     // Scroll to top on mount
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const data = await listingsAPI.getAll();
+        setProducts(Array.isArray(data) ? data.slice(0, 12) : []);
+      } catch (e) {
+        console.error('Failed to load listings:', e);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    fetchLatest();
   }, []);
 
 
@@ -208,6 +225,70 @@ const Welcome = () => {
             >
               Start Selling
             </Button>
+          </motion.div>
+        </section>
+
+        {/* ── Live Products Section ── */}
+        <section className="relative z-10 max-w-7xl mx-auto px-6 pt-4 pb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {/* Section header */}
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <p className="text-xs font-black text-primary uppercase tracking-[0.25em] mb-1">Live on Yavuli</p>
+                <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900">
+                  Fresh Listings
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                className="text-slate-500 hover:text-slate-900 font-bold hidden sm:flex items-center gap-1"
+                onClick={() => navigate('/explore')}
+              >
+                See all <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Grid */}
+            {productsLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="rounded-[2rem] bg-slate-100 animate-pulse">
+                    <div className="aspect-[4/3] rounded-t-[2rem] bg-slate-200" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-slate-200 rounded-full w-3/4" />
+                      <div className="h-4 bg-slate-200 rounded-full w-1/2" />
+                      <div className="h-3 bg-slate-200 rounded-full w-2/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : products.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} {...product} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 text-slate-400 font-medium">
+                No listings yet — be the first to sell!
+              </div>
+            )}
+
+            {/* CTA button */}
+            <div className="flex justify-center mt-12">
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-10 h-14 text-base font-bold rounded-2xl border-2 border-slate-200 text-slate-700 hover:border-primary hover:text-primary hover:bg-primary/5 transition-all gap-2"
+                onClick={() => navigate('/explore')}
+              >
+                Explore All Items <ArrowRight className="h-5 w-5" />
+              </Button>
+            </div>
           </motion.div>
         </section>
 

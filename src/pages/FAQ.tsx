@@ -26,6 +26,11 @@ const faqCategories: FAQCategory[] = [
         color: "from-violet-500 to-purple-600",
         questions: [
             {
+                question: "Does Yavuli handle delivery itself?",
+                answer:
+                    "Yavuli does not personally deliver items. We are currently in the process of partnering with delivery services to bring integrated shipping to the platform! For now, local campus meets are a direct handoff, and for inter-campus or distant transactions, buyers and sellers need to arrange delivery and agree on charges themselves.",
+            },
+            {
                 question: "How does delivery work on Yavuli?",
                 answer:
                     "Delivery on Yavuli is managed directly between the buyer and seller — no middleman. Once you agree on a deal, both parties connect via call or chat (our built-in messaging) to decide a time and place to meet. It's simple, fast, and personal.",
@@ -39,11 +44,6 @@ const faqCategories: FAQCategory[] = [
                 question: "What if the buyer and seller are on different campuses?",
                 answer:
                     "For inter-campus transactions, you have two options: (1) Arrange a meet-up at a mutually convenient location between your campuses, or (2) Arrange delivery through a third-party courier service yourself. We are currently in the process of partnering with delivery services to make this seamless for you! Until then, you can discuss and arrange delivery logistics over call or chat before confirming.",
-            },
-            {
-                question: "Does Yavuli handle delivery itself?",
-                answer:
-                    "Yavuli does not personally deliver items. We are currently in the process of partnering with delivery services to bring integrated shipping to the platform! For now, local campus meets are a direct handoff, and for inter-campus or distant transactions, buyers and sellers need to arrange delivery and agree on charges themselves.",
             },
             {
                 question: "Are there any delivery charges?",

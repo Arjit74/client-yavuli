@@ -38,17 +38,17 @@ const faqCategories: FAQCategory[] = [
             {
                 question: "What if the buyer and seller are on different campuses?",
                 answer:
-                    "For inter-campus transactions, you have two options: (1) Arrange a meet-up at a mutually convenient location between your campuses, or (2) Use one of our partnered delivery services to mail the item. Delivery charges apply based on distance and the delivery partner's rates. You can discuss this over call or chat before confirming.",
+                    "For inter-campus transactions, you have two options: (1) Arrange a meet-up at a mutually convenient location between your campuses, or (2) Arrange delivery through a third-party courier service yourself. We are currently in the process of partnering with delivery services to make this seamless for you! Until then, you can discuss and arrange delivery logistics over call or chat before confirming.",
             },
             {
                 question: "Does Yavuli handle delivery itself?",
                 answer:
-                    "Yavuli does not personally deliver items. For local campus meets, it's a direct handoff. For inter-campus or distant buyers/sellers, Charges for delivery are separate and agreed upon by both parties.",
+                    "Yavuli does not personally deliver items. We are currently in the process of partnering with delivery services to bring integrated shipping to the platform! For now, local campus meets are a direct handoff, and for inter-campus or distant transactions, buyers and sellers need to arrange delivery and agree on charges themselves.",
             },
             {
                 question: "Are there any delivery charges?",
                 answer:
-                    "For same-campus meetups, there are no delivery charges — just meet up and exchange! For inter-campus or mailed deliveries via our partner services, standard delivery charges apply based on weight, distance, and the partner's pricing. Always confirm charges with the other party before proceeding.",
+                    "For same-campus meetups, there are no delivery charges — just meet up and exchange! For inter-campus deliveries, since you will arrange shipping yourself for now (our integrated delivery partner services are coming soon!), charges will depend on the third-party courier service you choose based on weight and distance. Always confirm delivery arrangements and charges with the other party before proceeding.",
             },
         ],
     },
@@ -117,7 +117,7 @@ const faqCategories: FAQCategory[] = [
             {
                 question: "Does Yavuli charge any fees?",
                 answer:
-                    "Listing items on Yavuli is completely free. We don't take a cut from campus meetup transactions. For deliveries using our partner services, standard shipping charges apply. We're committed to keeping Yavuli as cost-free for students as possible.",
+                    "Listing items on Yavuli is completely free. We don't take a cut from campus meetup transactions. For inter-campus deliveries, since users currently arrange their own shipping, standard third-party charges apply based on your chosen courier. We're committed to keeping Yavuli as cost-free for students as possible.",
             },
             {
                 question: "What payment methods are accepted?",

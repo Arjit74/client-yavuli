@@ -262,8 +262,8 @@ export default function FAQ() {
                             <button
                                 onClick={() => setActiveCategory(null)}
                                 className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all ${activeCategory === null
-                                        ? "bg-slate-900 text-white shadow-md"
-                                        : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                                    ? "bg-violet-600 text-white shadow-lg shadow-violet-200 border-2 border-violet-600"
+                                    : "bg-white border-2 border-slate-300 text-slate-700 hover:border-violet-400 hover:text-violet-600"
                                     }`}
                             >
                                 All Topics
@@ -275,8 +275,8 @@ export default function FAQ() {
                                         setActiveCategory(activeCategory === cat.id ? null : cat.id)
                                     }
                                     className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all flex items-center gap-1.5 ${activeCategory === cat.id
-                                            ? "bg-slate-900 text-white shadow-md"
-                                            : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-200 border-2 border-violet-600"
+                                        : "bg-white border-2 border-slate-300 text-slate-700 hover:border-violet-400 hover:text-violet-600"
                                         }`}
                                 >
                                     {cat.icon}

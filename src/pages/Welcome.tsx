@@ -75,6 +75,9 @@ const Welcome = () => {
               <Button variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-transparent font-semibold" onClick={() => navigate('/how-to-use')}>
                 How to Use
               </Button>
+              <Button variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-transparent font-semibold" onClick={() => navigate('/faq')}>
+                FAQ
+              </Button>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

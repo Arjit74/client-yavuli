@@ -114,13 +114,13 @@ const Welcome = () => {
                   </DropdownMenuItem>
                 </a>
                 <div className="h-px bg-slate-100 my-2 mx-1" />
-                <a href="mailto:founder@yavuli.app" className="block">
+                <a href="mailto:admin@yavuli.app" className="block">
                   <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer rounded-xl hover:bg-slate-50 focus:bg-slate-50 focus:text-slate-900 transition-colors">
                     <div className="flex items-center gap-2 text-primary font-semibold">
                       <Mail className="h-4 w-4" />
                       <span>Email Us</span>
                     </div>
-                    <span className="text-sm font-bold text-slate-900 break-all">founder@yavuli.app</span>
+                    <span className="text-sm font-bold text-slate-900 break-all">admin@yavuli.app</span>
                   </DropdownMenuItem>
                 </a>
               </DropdownMenuContent>

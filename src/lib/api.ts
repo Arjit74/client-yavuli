@@ -33,9 +33,9 @@ export const authAPI = {
 
 // Listings API
 export const listingsAPI = {
-  getAll: async () => {
+  getAll: async (params?: { category?: string; minPrice?: number; maxPrice?: number; condition?: string; verified?: string; searchQuery?: string; limit?: number }) => {
     try {
-      const response = await api.get("/listings");
+      const response = await api.get("/listings", { params });
       console.log("Raw API Response:", response);
 
       // Handle case where response.data is the array directly

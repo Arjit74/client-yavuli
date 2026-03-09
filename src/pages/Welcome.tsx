@@ -48,8 +48,8 @@ const Welcome = () => {
   useEffect(() => {
     const fetchLatest = async () => {
       try {
-        const data = await listingsAPI.getAll();
-        setProducts(Array.isArray(data) ? data.slice(0, 12) : []);
+        const data = await listingsAPI.getAll({ limit: 12 });
+        setProducts(Array.isArray(data) ? data : []);
       } catch (e) {
         console.error('Failed to load listings:', e);
       } finally {

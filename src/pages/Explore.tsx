@@ -10,7 +10,6 @@ import SEO from "@/components/SEO";
 
 const Explore = () => {
   const [products, setProducts] = useState<any[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
@@ -26,12 +25,32 @@ const Explore = () => {
     { label: "Others", value: "others" },
   ];
 
+  // --- Debounce search query ---
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await listingsAPI.getAll();
+      const params: any = { limit: 50 }; // Fetch up to 50 items
+
+      if (debouncedSearch) {
+        params.searchQuery = debouncedSearch;
+      }
+
+      if (activeCategory !== "all") {
+        params.category = activeCategory;
+      }
+
+      const response = await listingsAPI.getAll(params);
       setProducts(Array.isArray(response) ? response : []);
-      setFilteredProducts(Array.isArray(response) ? response : []);
     } catch (err) {
       console.error('Error:', err);
     } finally {
@@ -41,19 +60,7 @@ const Explore = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    const filtered = products.filter(product => {
-      const matchesSearch =
-        product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        activeCategory === "all" || product.category?.toLowerCase() === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-    setFilteredProducts(filtered);
-  }, [products, searchQuery, activeCategory]);
+  }, [debouncedSearch, activeCategory]);
 
   const handleResetFilters = () => {
     const params = new URLSearchParams(searchParams);
@@ -119,7 +126,7 @@ const Explore = () => {
         {/* Results Info */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-            {filteredProducts.length} Results
+            {products.length} Results
           </p>
           {(searchQuery || activeCategory !== "all") && (
             <Button
@@ -152,9 +159,9 @@ const Explore = () => {
               </div>
             ))}
           </div>
-        ) : filteredProducts.length > 0 ? (
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
